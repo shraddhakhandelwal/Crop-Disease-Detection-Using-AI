@@ -2,23 +2,82 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Crop Disease Detection</title>
+    <title>Crop Disease Detection & Analysis</title>
     <style>
-      body { font-family: Arial, sans-serif; max-width: 720px; margin: 2rem auto; }
+      body { font-family: Arial, sans-serif; max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
       .preview { max-width: 400px; display:block; margin-bottom: 1rem }
       .result { margin-top: 1rem; }
       .label { font-weight: bold; }
       .note { color: #666; font-size: 0.9rem }
+      .container { display: flex; gap: 2rem; flex-wrap: wrap; }
+      .upload-section, .analysis-section { flex: 1; min-width: 300px; }
+      .treatment { background: #f0f8ff; padding: 1rem; border-radius: 4px; margin-top: 1rem; }
+      .stats { background: #f5f5f5; padding: 1rem; border-radius: 4px; margin-top: 1rem; }
+      .visualization { max-width: 100%; margin-top: 1rem; }
+      .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
+      .tab { padding: 0.5rem 1rem; cursor: pointer; border: 1px solid #ddd; border-radius: 4px; }
+      .tab.active { background: #007bff; color: white; }
+      .form-group { margin-bottom: 1rem; }
+      label { display: block; margin-bottom: 0.5rem; }
     </style>
   </head>
   <body>
-    <h1>Crop Disease Detection</h1>
-    <p class="note">Upload a leaf image and the model will return the top predictions.</p>
-    <input id="fileInput" type="file" accept="image/*">
-    <img id="preview" class="preview" src="" alt="preview" hidden>
-    <button id="uploadBtn">Upload & Predict</button>
+    <h1>Crop Disease Detection & Analysis</h1>
+    
+    <div class="container">
+      <div class="upload-section">
+        <h2>Disease Detection</h2>
+        <p class="note">Upload a leaf image for disease detection and treatment recommendations.</p>
+        
+        <div class="form-group">
+          <label for="cropType">Crop Type:</label>
+          <select id="cropType">
+            <option value="tomato">Tomato</option>
+            <option value="potato">Potato</option>
+            <option value="pepper">Pepper</option>
+            <option value="corn">Corn</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="location">Location:</label>
+          <input type="text" id="location" placeholder="e.g., Field A">
+        </div>
+        
+        <div class="form-group">
+          <label for="weather">Weather Conditions:</label>
+          <input type="text" id="weather" placeholder="e.g., Sunny, humid">
+        </div>
+        
+        <input id="fileInput" type="file" accept="image/*">
+        <img id="preview" class="preview" src="" alt="preview" hidden>
+        <button id="uploadBtn">Upload & Predict</button>
 
-    <div id="result" class="result"></div>
+        <div id="result" class="result"></div>
+      </div>
+
+      <div class="analysis-section">
+        <h2>Analysis & Insights</h2>
+        <div class="tabs">
+          <div class="tab active" data-tab="overview">Overview</div>
+          <div class="tab" data-tab="trends">Trends</div>
+          <div class="tab" data-tab="recommendations">Recommendations</div>
+        </div>
+
+        <div id="overview" class="tab-content">
+          <div class="stats"></div>
+          <img class="visualization" id="distributionChart">
+        </div>
+
+        <div id="trends" class="tab-content" style="display: none">
+          <img class="visualization" id="trendChart">
+        </div>
+
+        <div id="recommendations" class="tab-content" style="display: none">
+          <div id="pesticideRecommendations"></div>
+        </div>
+      </div>
+    </div>
 
     <script>
       const fileInput = document.getElementById('fileInput');
