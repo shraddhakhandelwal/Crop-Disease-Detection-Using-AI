@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5000"
+    volumes:
+      - .:/app
+    environment:
+      - FLASK_ENV=development
+    command: python src/app.py --model models/model.h5 --labels models/model_labels.json --host 0.0.0.0 --port 5000
+  web_tfbase:
+    build:
+      context: .
+      dockerfile: Dockerfile.tf
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+    command: python src/app.py --model models/model.h5 --labels models/model_labels.json --host 0.0.0.0 --port 5000

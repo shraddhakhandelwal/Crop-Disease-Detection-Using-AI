@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Crop Disease Detection</title>
+    <style>
+      body { font-family: Arial, sans-serif; max-width: 720px; margin: 2rem auto; }
+      .preview { max-width: 400px; display:block; margin-bottom: 1rem }
+      .result { margin-top: 1rem; }
+      .label { font-weight: bold; }
+      .note { color: #666; font-size: 0.9rem }
+    </style>
+  </head>
+  <body>
+    <h1>Crop Disease Detection</h1>
+    <p class="note">Upload a leaf image and the model will return the top predictions.</p>
+    <input id="fileInput" type="file" accept="image/*">
+    <img id="preview" class="preview" src="" alt="preview" hidden>
+    <button id="uploadBtn">Upload & Predict</button>
+
+    <div id="result" class="result"></div>
+
+    <script>
+      const fileInput = document.getElementById('fileInput');
+      const preview = document.getElementById('preview');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const resultDiv = document.getElementById('result');
+
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        preview.src = URL.createObjectURL(file);
+        preview.hidden = false;
+        resultDiv.innerHTML = '';
+      });
+
+      uploadBtn.addEventListener('click', async () => {
+        const file = fileInput.files[0];
+        if (!file) { alert('Choose a file first'); return; }
+        uploadBtn.disabled = true;
+        uploadBtn.textContent = 'Uploading...';
+        const fd = new FormData();
+        fd.append('file', file);
+        try {
+          const resp = await fetch('/predict', { method: 'POST', body: fd });
+          const json = await resp.json();
+          if (resp.status !== 200) {
+            resultDiv.innerHTML = '<div style="color:red">Error: ' + (json.error || resp.statusText) + '</div>';
+          } else {
+            let html = '<h3>Predictions</h3><ol>';
+            json.forEach(p => {
+              html += `<li><span class="label">${p.label}</span>: ${(p.score*100).toFixed(2)}%`;
+              html += '</li>';
+            });
+            html += '</ol>';
+            resultDiv.innerHTML = html;
+          }
+        } catch (e) {
+          resultDiv.innerHTML = '<div style="color:red">Upload failed: ' + e.message + '</div>';
+        } finally {
+          uploadBtn.disabled = false;
+          uploadBtn.textContent = 'Upload & Predict';
+        }
+      });
+    </script>
+  </body>
+</html>

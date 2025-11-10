@@ -1,0 +1,18 @@
+# Smaller runtime Dockerfile: installs only runtime deps (Flask + Pillow).
+# NOTE: This image will NOT include TensorFlow. If you need to run model inference inside the container,
+# either install TensorFlow in this image or mount/serve the model from a separate service.
+
+FROM python:3.11-slim
+WORKDIR /app
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+COPY requirements-runtime.txt ./
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements-runtime.txt
+
+COPY . /app
+
+EXPOSE 5000
+
+CMD ["python", "src/app.py", "--model", "models/model.h5", "--labels", "models/model_labels.json", "--host", "0.0.0.0", "--port", "5000"]
